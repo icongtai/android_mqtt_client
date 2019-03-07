@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/sendMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendMessage"
+        android:text="发送消息" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sub"
+        android:text="订阅" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="unSub"
+        android:text="取消订阅" />
+
+    <Button
+        android:id="@+id/addGroupTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="addGroupTask"
+        android:text="添加任务" />
+
+    <Button
+        android:id="@+id/removeGroupTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="removeGroupTask"
+        android:text="移除任务" />
+</LinearLayout>

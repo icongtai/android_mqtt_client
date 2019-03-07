@@ -1,0 +1,44 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        sourceSets {
+            main {
+            }
+        }
+
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation rootProject.ext.dependen["support-v4"]
+    implementation 'com.j256.ormlite:ormlite-android:5.1'
+    api(rootProject.ext.dependen["paho.client.mqttv3"]){
+        exclude group: "com.google.code.findbugs"
+    }
+    // https://mvnrepository.com/artifact/androidx.annotation/annotation
+    implementation rootProject.ext.dependen["support-annotations"]
+    androidTestImplementation 'androidx.test:core:1.1.0'
+    androidTestImplementation 'androidx.arch.core:core-testing:2.0.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
+}
