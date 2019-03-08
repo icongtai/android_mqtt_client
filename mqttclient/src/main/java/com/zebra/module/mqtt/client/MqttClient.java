@@ -20,10 +20,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.zebra.module.mqtt.client.OptStore.Publish;
 import static com.zebra.module.mqtt.client.OptStore.RefreshCycleJob;
@@ -53,7 +50,7 @@ public class MqttClient {
 
     private MqttService mMqttService;
     private Context context;
-    private List<OptStore> optStores = Collections.synchronizedList(new ArrayList<OptStore>());
+    private final CopyOnWriteArrayList<OptStore> optStores = new CopyOnWriteArrayList<>();
 
     public BroadcastReceiver connectionRecevier = new BroadcastReceiver() {
 
@@ -74,11 +71,9 @@ public class MqttClient {
         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
             synchronized (optStores) {
                 if (optStores.size() > 0) {
-                    Iterator<OptStore> optIterator = optStores.iterator();
-                    while (optIterator.hasNext()) {
-                        OptStore opt = optIterator.next();
+                    for (OptStore opt : optStores) {
                         if (opt.optType == Publish) {
-                            optIterator.remove();
+                            optStores.remove(opt);
                             opt.message.callback.onFailure(asyncActionToken, exception);
                         }
                     }
@@ -202,11 +197,10 @@ public class MqttClient {
     }
 
     private void redoOpt(String log) {
+        Logger.d(TAG,"redoOpt "+log);
         synchronized (optStores) {
-            Iterator<OptStore> optIterator = optStores.iterator();
-            while (optIterator.hasNext()) {
-                OptStore opt = optIterator.next();
-                doOptInServiceSync(optIterator, opt.optType, opt.message, "redoOpt " + log);
+            for (OptStore opt : optStores) {
+                doOptInServiceSync(opt, opt.optType, opt.message, "redoOpt " + log);
             }
         }
     }
@@ -234,31 +228,32 @@ public class MqttClient {
     }
 
 
-    public void doRemove(Iterator<OptStore> iterator) {
-        if (iterator != null) {
-            iterator.remove();
+    public void doRemove(OptStore opt) {
+        if (opt != null) {
+            Logger.d(TAG,"doRemove "+opt);
+            optStores.remove(opt);
         }
     }
 
-    private IMqttToken doOptInServiceSync(Iterator<OptStore> iterator, int type, MqttMessageWrap message, String log) {
+    private IMqttToken doOptInServiceSync(OptStore opt, int type, MqttMessageWrap message, String log) {
         Logger.d(TAG, "doOptInServiceSync " + log);
         IMqttToken token = null;
         if (mMqttService == null) {
             //should not happen
-            doRemove(iterator);
+            doRemove(opt);
             Logger.e(TAG, "mMqttService is null");
             return null;
         }
         if (type == RefreshCycleJob) {
-            doRemove(iterator);
+            doRemove(opt);
             refresheCycleJob("type " + type);
             return null;
         }
-        token = doOptInConntionSync(iterator, type, message);
+        token = doOptInConntionSync(opt, type, message);
         return token;
     }
 
-    public IMqttToken doOptInConntionSync(Iterator<OptStore> iterator, int type, MqttMessageWrap message) {
+    public IMqttToken doOptInConntionSync(OptStore opt, int type, MqttMessageWrap message) {
         Logger.d(TAG, "doOptInConntionSync");
         IMqttToken token = null;
         MqttConntion conntion = getZebraMqttConntion();
@@ -267,7 +262,7 @@ public class MqttClient {
             return createOrReconnectAsync();
         }
         if (conntion != null && conntion.getStatus() == Conntioned) {
-            doRemove(iterator);
+            doRemove(opt);
             Logger.d(TAG, "excute " + type);
             token = mMqttService.excute(type, uniconId, message);
         }
