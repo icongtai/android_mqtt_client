@@ -5,7 +5,19 @@
 - 3支持添加定时任务
 - 4支持任务优先级
 
+config
+```
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
 
+```
+ implementation 'com.github.icongtai:android_mqtt_client:1.1.2'
+```
 
 发送消息
 
