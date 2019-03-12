@@ -1,21 +1,23 @@
+# android_mqtt_client [![](https://jitpack.io/v/icongtai/android_mqtt_client.svg)](https://jitpack.io/#icongtai/android_mqtt_client)
 
 ### 功能
+
 - 1隐藏处理连接逻辑
 - 2后台服务，链接重用
 - 3支持添加定时任务
 - 4支持任务优先级
 
 config
-```
+```groovy
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
+}
 ```
 
-```
+```groovy
  implementation 'com.github.icongtai:android_mqtt_client:1.1.2'
 ```
 
@@ -28,14 +30,14 @@ mMqttClient.publishAsync(MqttMessageWrap);
 
 添加任务组,任务会周期执行
 
-```
+```java
 mMqttClient.addOrRemoveJobGroup(CycleJobGroup, true);
 ```
 
 
 构造mqtt client
 
-```
+```java
 MqttClient getMqttClient(){
     //配置
     final StoreMqttConnectOptions options = StoreMqttConnectOptions.get(broker);
@@ -53,7 +55,7 @@ MqttClient getMqttClient(){
 
 构造CycleJobGroup
 
-```
+```java
 CycleJobGroup getCycleJobGroup(){
     CycleJobGroup jobGroup = CycleJobGroup.getCycleJobGroup("唯一标识", (int)优先级, 周期-秒);
     //options同ZebraMqttClient配置
@@ -68,7 +70,7 @@ CycleJobGroup getCycleJobGroup(){
 
 任务实现
 
-```
+```java
 public class TestIMqttConsumer implements IMqttConsumer {
 
     @Override
@@ -88,7 +90,7 @@ public class TestIMqttConsumer implements IMqttConsumer {
 
 构造MqttMessageWrap
 
-```
+```java
 MqttMessageWrap getMqttMessageWrap(){
    //mqtt orgin message
     MqttMessage mqttMessage = new MqttMessage("hello zebra");
@@ -105,7 +107,7 @@ MqttMessageWrap getMqttMessageWrap(){
 
 发送消息详细
 
-```
+```java
 //设置回调
 zebraMessage.callback = new IMqttActionListener() {
             @Override
@@ -124,7 +126,7 @@ mMqttClient.publishAsync(message);
  
 消息订阅
 
-```
+```java
 message.topic=topic;
 message.qos=qos;
 message.messageListeners = listener;
@@ -134,7 +136,7 @@ mMqttClient.subscribeAsync(message);
  
 取消订阅
 
-```
+```java
 message.topic=topic;
 message.callback = callback;
 mMqttClient.unSubscribeAsync(message);
@@ -143,7 +145,7 @@ mMqttClient.unSubscribeAsync(message);
  
 添加任务组说明
 
-```
+```java
 CycleJobGroup jobGroup = CycleJobGroup.getCycleJobGroup("唯一标识", (int)优先级, 周期-秒);
 //options同ZebraMqttClient配置
 CycleJob cycleJob = CycleJob.create(TestJobMqttSourceProvider.class,options);
